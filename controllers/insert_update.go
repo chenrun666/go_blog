@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type LoginController struct {
+type InsertController struct {
 	beego.Controller
 }
 
@@ -14,7 +14,7 @@ type UpdateController struct {
 	beego.Controller
 }
 
-func (this *LoginController) Get() {
+func (this *InsertController) Get() {
 	// 获取orm对象
 	o := orm.NewOrm()
 
