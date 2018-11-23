@@ -15,5 +15,4 @@ func init() {
 	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1:3306)/go_blog?charset=utf8")
 	orm.RegisterModel(new(UserInfo))
 	orm.RunSyncdb("default", false, true)
-
 }

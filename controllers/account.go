@@ -26,6 +26,13 @@ func (this *LoginController) Post() {
 	username := this.GetString("username")
 	password := this.GetString("password")
 
+	// 初步验证用户名和密码
+	if username == "" || password == "" {
+		beego.Info("用户名或密码不能为空")
+		this.Redirect("/redister", 302)
+		return
+	}
+
 	// orm对象
 	o := orm.NewOrm()
 	// 获取表对象
@@ -34,20 +41,18 @@ func (this *LoginController) Post() {
 	userinfo.Name = username
 	// 查询
 	err := o.Read(&userinfo, "Name")
-
-	if err == nil {
-		// 没有错误，有该用户，判断密码是否正确
-		if userinfo.Password == password {
-			this.Redirect("/", 302)
-			return
-		} else {
-			// 密码错误
-
-		}
+	if err != nil {
+		beego.Info("查询失败")
+		this.Ctx.WriteString("没有该用户！！！")
+		return
 	}
-	// 没有用户名
-
-	this.TplName = "account/login.html"
+	if userinfo.Password == password {
+		this.Redirect("/", 302)
+		return
+	}
+	beego.Info("密码错误")
+	this.Ctx.WriteString("密码错误")
+	return
 
 }
 
@@ -58,7 +63,40 @@ func (this *RegisterController) Get() {
 }
 
 func (this *RegisterController) Post() {
-	// 验证注册的数据，保存到数据库中
-	this.TplName = "index.html"
+
+	// 获取提交的数据
+	username := this.GetString("username")
+	password := this.GetString("password")
+	againpwd := this.GetString("againpwd")
+
+	// 校验数据
+	if username == "" || password == "" || againpwd == "" {
+		beego.Info("数据不能为空")
+		this.Ctx.WriteString("数据不能为空")
+		return
+	}
+	if password != againpwd {
+		beego.Info("两次密码不一致")
+		this.Ctx.WriteString("两次密码不一致")
+		return
+	}
+
+	// 获取orm对象
+	o := orm.NewOrm()
+	// 获取操作的表
+	userdata := models.UserInfo{}
+	// 赋值
+	userdata.Name = username
+	userdata.Password = password
+	// 插入数据库中
+	_, err := o.Insert(&userdata)
+	if err != nil {
+		beego.Info("添加失败")
+		this.Ctx.WriteString("注册失败")
+		return
+	}
+
+	// 注册成功跳转页面
+	this.Redirect("/login", 301)
 
 }
